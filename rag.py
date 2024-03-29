@@ -44,6 +44,37 @@ class RAG:
         pinecone.init(api_key=self.pinecone_api_key)
         self.index = pinecone.Index(self.pinecone_index_name)
 
+     def store_chunks(self, chunks):
+        """
+        Stores the processed text chunks in the Pinecone index.
+
+        Args:
+            chunks (List[Tuple[str, Tuple[str, int]]]): List of text chunks with references.
+        """
+        for chunk, references in chunks:
+            embedding = self.model.encode(chunk)
+            pdf_filename, page_number = references[0]
+            self.index.upsert(id=pdf_filename + "_" + str(page_number), vectors=embedding, metadata={"chunk": chunk, "page_number": page_number})
+
+     def semantic_search(self, query):
+        """
+        Performs semantic search to find the most relevant text chunks for a given query.
+
+        Args:
+            query (str): User's query string.
+
+        Returns:
+            List[int]: List of chunk IDs representing the top search results.
+        """
+        query_embedding = self.model.encode(query)
+        results = self.index.query(queries=query_embedding, top_k=self.top_k)
+        top_chunk_ids = [match["id"] for match in results["matches"]]
+        if self.verbose:
+            print('Semantic search returning IDs', top_chunk_ids)
+        
+        return top_chunk_ids
+
+     
     def initialize_database(self):
         """
         Creates necessary tables in the SQLite database if they don't already exist.
