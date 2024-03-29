@@ -13,25 +13,20 @@ import openai
 
 class RAG:
      
-    def __init__(self, db_path, llm_api_key, embedding_model='all-MiniLM-L6-v2', llm_engine = 'gpt-3.5-turbo', chunk_size=250, overlap=25, top_k = 3, search_threshold=0.8, max_token_length=512, cache_size=1000, verbose=False):
+    def __init__(self, pinecone_api_key, pinecone_index_name, llm_api_key, embedding_model='all-MiniLM-L6-v2', llm_engine = 'gpt-3.5-turbo', chunk_size=250, overlap=25, top_k = 3, search_threshold=0.8, max_token_length=512, cache_size=1000, verbose=False):
         """
-        Initializes the RAG instance with database connection and configurations.
+        Initializes the RAG instance with Pinecone client and configurations.
 
         Args:
-            db_path (str): Path to the SQLite database file.
+            pinecone_api_key (str): API key for Pinecone.
+            pinecone_index_name (str): Name of the Pinecone index.
             llm_api_key (str): API key for OpenAI's language model.
             embedding_model (str): Name of the sentence transformer model for embeddings.
-            chunk_size (int): Maximum length of each chunk in characters.
-            overlap (int): Number of characters to overlap between chunks.
-            top_k (int): Number of top results to retrieve in semantic search.
-            search_threshold (float): Threshold for similarity in semantic search.
-            max_token_length (int): Maximum token length for language model responses.
-            cache_size (int): Size of the cache for storing recent queries and responses.
-            verbose (bool): Flag to enable verbose logging for debugging.
+            chunk_size (int), overlap (int), top_k (int), search_threshold (float),
+            max_token_length (int), cache_size (int), verbose (bool): Various configuration options.
         """
-       
-        self.db_path = db_path
-        self.db = sqlite3.connect(db_path)
+        self.pinecone_api_key = pinecone_api_key
+        self.pinecone_index_name = pinecone_index_name
         self.llm_api_key = llm_api_key
         self.embedding_model = embedding_model
         self.chunk_size = chunk_size
@@ -44,7 +39,10 @@ class RAG:
         self.verbose = verbose
         self.model = SentenceTransformer(embedding_model)
         self.llm_engine = llm_engine
-        self.initialize_database()
+
+        # Initialize Pinecone client
+        pinecone.init(api_key=self.pinecone_api_key)
+        self.index = pinecone.Index(self.pinecone_index_name)
 
     def initialize_database(self):
         """
