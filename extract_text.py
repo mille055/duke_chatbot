@@ -108,8 +108,7 @@ def process_urls_concurrently(urls, max_workers=5):
 # Example usage
 if __name__ == "__main__":
     urls = [
-        "https://example.com",
-        "https://www.python.org",
-        # Add more URLs as needed
+        "https://ai.meng.duke.edu/degree"
+        # Room for more URLs as needed
     ]
     process_urls_concurrently(urls)
