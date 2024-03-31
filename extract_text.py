@@ -4,9 +4,29 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 import json
 from datetime import datetime
+from urllib.parse import urlparse, urljoin
+import argparse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def parse_arguments():
+    """
+    Parses command-line arguments.
+    """
+    parser = argparse.ArgumentParser(description='Extract text from all pages within a domain.')
+    parser.add_argument('-u', '--url', default='https://ai.meng.duke.edu/degree', help='The main URL to start crawling from. Defaults to https://ai.meng.duke.edu/degree')
+    args = parser.parse_args()
+    return args.url
+
+
+def is_valid_url(url, domain_name):
+    """
+    Checks if a URL is valid and belongs to the specified domain.
+    """
+    parsed_url = urlparse(url)
+    return bool(parsed_url.netloc) and domain_name in parsed_url.netloc
+
 
 def fetch_url_content(url):
     """
@@ -44,6 +64,53 @@ def extract_text_from_html(html_content):
     text = ' '.join(text.split())
     
     return text
+
+def get_all_website_links(url):
+    """
+    Returns all URLs that are found on 'url' in which it belongs to the same website
+    """
+    # Domain name of the URL without the protocol
+    domain_name = urlparse(url).netloc
+    urls = set()  # All discovered URLs
+    visited_urls = set()  # Set of visited URLs to avoid processing a page more than once
+    urls.add(url)
+    visited_urls.add(url)
+
+    session = requests.Session()
+    session.headers["User-Agent"] = "Googlebot/2.1 (+http://www.google.com/bot.html)"
+    
+    while urls:
+        current_url = urls.pop()
+        print(f"Crawling: {current_url}")
+        try:
+            response = session.get(current_url)
+            response.raise_for_status()  # ensure we notice bad responses
+        except (requests.RequestException, ValueError):
+            continue
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+        for a_tag in soup.findAll("a"):
+            href = a_tag.attrs.get("href")
+            if href == "" or href is None:
+                # href empty tag
+                continue
+            href = urljoin(current_url, href)
+            parsed_href = urlparse(href)
+            # remove URL GET parameters, URL fragments, etc.
+            href = parsed_href.scheme + "://" + parsed_href.netloc + parsed_href.path
+            
+            if not is_valid_url(href, domain_name):
+                # not a valid URL
+                continue
+            if href in visited_urls:
+                # already visited URL
+                continue
+            visited_urls.add(href)
+            urls.add(href)
+    
+    return visited_urls
+
+
 
 def fetch_and_process_url(url):
     """
@@ -107,8 +174,7 @@ def process_urls_concurrently(urls, max_workers=5):
 
 # Example usage
 if __name__ == "__main__":
-    urls = [
-        "https://ai.meng.duke.edu/degree"
-        # Room for more URLs as needed
-    ]
-    process_urls_concurrently(urls)
+    main_url = parse_arguments()
+    all_links = get_all_website_links(main_url)
+
+    process_urls_concurrently(all_links)
