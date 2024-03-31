@@ -286,6 +286,22 @@ class RAG:
 
         self.db.commit()
 
+     def load_and_process_json(self, json_file):
+        """
+        Loads text data from a JSON file, processes, and stores chunks in Pinecone with source information.
+        """
+        with open(json_file, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        for source, text in data.items():
+            # Assuming 'text' might be a large string or a list of chunks
+            # If text is not already chunked, you would chunk it here
+            if isinstance(text, list):
+                for i, chunk in enumerate(text):
+                    self.process_text(source, chunk, i)
+            else:
+                self.process_text(source, text, 0)
+
     def semantic_search(self, query):
         """
         Performs semantic search to find the most relevant text chunks for a given query.
