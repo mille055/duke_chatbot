@@ -2,6 +2,8 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
+import json
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -52,21 +54,56 @@ def fetch_and_process_url(url):
     text = extract_text_from_html(html_content)
     return text
 
+# def process_urls_concurrently(urls, max_workers=5):
+#     """
+#     Uses threading to process multiple URLs concurrently.
+#     """
+#     with ThreadPoolExecutor(max_workers=max_workers) as executor:
+#         future_to_url = {executor.submit(fetch_and_process_url, url): url for url in urls}
+#         for future in future_to_url:
+#             url = future_to_url[future]
+#             try:
+#                 data = future.result()
+#                 # Optional: Save or process the data here
+#             except Exception as exc:
+#                 logging.error(f'{url} generated an exception: {exc}')
+#             else:
+#                 logging.info(f'{url} page length: {len(data)}')
+
+
+def save_to_json(data, filename="extracted_data.json"):
+    """
+    Saves extracted text data to a JSON file.
+    
+    Args:
+        data (dict): A dictionary where each key is a URL or filename and the value is the extracted text.
+        filename (str): Name of the file to save the data.
+    """
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+        logging.info(f"Data successfully saved to {filename}")
+
 def process_urls_concurrently(urls, max_workers=5):
     """
-    Uses threading to process multiple URLs concurrently.
+    Processes multiple URLs concurrently and saves the results to a JSON file.
     """
+    extracted_data = {}
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_url = {executor.submit(fetch_and_process_url, url): url for url in urls}
         for future in future_to_url:
             url = future_to_url[future]
             try:
-                data = future.result()
-                # Optional: Save or process the data here
+                text = future.result()
+                extracted_data[url] = text
             except Exception as exc:
                 logging.error(f'{url} generated an exception: {exc}')
             else:
-                logging.info(f'{url} page length: {len(data)}')
+                logging.info(f'{url} processed successfully')
+
+    # Save the extracted data to JSON
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    save_to_json(extracted_data, filename=f"extracted_data_{timestamp}.json")
+
 
 # Example usage
 if __name__ == "__main__":
