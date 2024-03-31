@@ -10,6 +10,8 @@ import numpy as np
 import sqlite3
 import openai
 #from haystack.nodes import PreProcessor, PDFToTextConverter
+from pinecone import Pinecone, ServerlessSpec
+
 
 class RAG:
      
