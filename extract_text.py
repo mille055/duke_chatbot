@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 import json
 from datetime import datetime
-from pinecone import Pinecone, ServerlessSpec
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
