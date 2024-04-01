@@ -4,7 +4,7 @@
 
 This project includes chat bot using a fine-tuned local LLM and a *Retrieval Augmented Generation* (RAG) System to chat with documents from the Duke University AI Master's program. It creates an interactive chat experience with the data gleaned from the Duke websites. Inspiration drawn from https://github.com/architkaila/Chat-With-Documents.
 
-![chatbot image](./assets/duke-image.png)
+![chatbot image](./assets/duke_picture1.png)
 
 ## Overview
 
