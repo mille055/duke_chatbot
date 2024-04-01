@@ -169,7 +169,7 @@ def process_urls_concurrently(urls, max_workers=5):
 
     # Save the extracted data to JSON
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    save_to_json(extracted_data, filename=f"extracted_data_{timestamp}.json")
+    save_to_json(extracted_data, filename=f"data/extracted_data_{timestamp}.json")
 
 
 # Example usage
