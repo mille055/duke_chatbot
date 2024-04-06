@@ -75,7 +75,7 @@ def run_UI():
             user_message(prompt)
 
         with st.chat_message("assistant", avatar=avatar_assistant):
-            whole_prompt = prompt+ " ".join([message['content'] for message in st.session_state.conversation_history])
+            whole_prompt = 'Please answer the following query:' + prompt + 'and the following context may be helpful' + " ".join([message['content'] for message in st.session_state.conversation_history])
             print(whole_prompt)
             response_text, sources = rag.generate_response(whole_prompt)
             # Append user query and response to conversation history
