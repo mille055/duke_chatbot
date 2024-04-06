@@ -26,7 +26,7 @@ def run_UI():
             float: left;
             clear: both;
         }
-        .stchat_message("assistant":) { 
+        .stchat_message("assistant") { 
             background-color: #012169; 
             padding: 10px; 
             border-radius: 15px; 
