@@ -78,33 +78,31 @@ class RAG:
                  print(text[0:40])
                  self.process_text(source, text, 0)
 
-    # def semantic_search(self, query):
-    #     query_embedding = self.model.encode(query).tolist()
-    #     #print(query_embedding)
-    #     results = self.index.query(queries=[query_embedding], top_k=self.top_k)
-        
-    #     return [match["id"] for match in results["matches"]]
+
     def semantic_search(self, query):
+        source_list = []
+        texts = []
         try:
             query_embedding = self.model.encode(query).tolist()
-            results = self.index.query(queries=[query_embedding], top_k=self.top_k)
-            return [match["id"] for match in results["matches"]]
+            results = self.index.query(vector=query_embedding, top_k=self.top_k, include_metadata=True)
+            matches = [match for match in results["matches"]]
+            for match in matches:
+                source_list.append(match['metadata']['source'])
+                texts.append(match['metadata']['text'])
+            return texts, source_list
         except Exception as e:
             print(f"Error during semantic search: {e}")
-            return []
+            return [], []
+        
 
     def generate_response(self, query):
-        best_chunk_ids = self.semantic_search(query)
-        if best_chunk_ids:
-            responses = []
-            for best_chunk_id in best_chunk_ids:
-                metadata = self.index.fetch_metadata(ids=[best_chunk_id]).get("metadata", {})
-                if metadata:
-                    responses.append(metadata[0]["text"])
-            combined_chunks = " ".join(responses)
-            return self.integrate_llm(combined_chunks + "\n" + query)
+        
+        texts, sources = self.semantic_search(query)
+        if texts:
+            combined_chunks = " ".join(texts)
+            return (self.integrate_llm(combined_chunks + "\n" + query), sources)
         else:
-            return "Sorry, I couldn't find a relevant response."
+            return ("Sorry, I couldn't find a relevant response.", None)
 
     def integrate_llm(self, prompt):
         try:
@@ -130,4 +128,5 @@ if __name__ == "__main__":
 
     # Query the pinecone vector storage
     phrase = 'Submit transcripts and letters of recommendation'
-    results_from_query = rag.semantic_search(phrase)
+    texts, sources = rag.semantic_search(phrase)
+    print(texts)
