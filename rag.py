@@ -4,10 +4,12 @@ import io
 import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import openai
-from pinecone import init, Index
+from pinecone import init, Index, Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 import os
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
@@ -24,31 +26,72 @@ class RAG:
         self.verbose = verbose
         self.model = SentenceTransformer(embedding_model)
         self.llm_engine = llm_engine
-
+        #self.tokenizer = AutoTokenizer.from_pretrained("YourFineTunedModel")
+        #self.model = AutoModelForCausalLM.from_pretrained("YourFineTunedModel")
+        
+        
         # Initialize Pinecone client
-        init(api_key=self.pinecone_api_key)
-        self.index = Index(self.pinecone_index_name)
+        self.pc = Pinecone(api_key=self.pinecone_api_key)
+        self.index = self.pc.Index(self.pinecone_index_name)
+    
+
+        # Create the Pinecone store
+    def create_pinecone(self, json_file, index_name='newindex'):
+            
+        if index_name in self.pc.list_indexes().names():
+            self.pc.delete_index(index_name)
+            #self.index = self.pc.Index(self.pinecone_index_name)
+        self.pc.create_index(
+                name=self.pinecone_index_name,
+                dimension= 384, #1536,
+                metric="cosine",
+                spec=ServerlessSpec(
+                    cloud="aws",
+                    region="us-west-2"
+                    )
+                )
+        self.index = self.pc.Index(self.pinecone_index_name)
+        self.load_and_process_json(json_file)
+
 
     def process_text(self, source, text, chunk_id):
         unique_id = hashlib.sha256(f"{source}_{chunk_id}".encode()).hexdigest()
-        embedding = self.model.encode(text)
-        self.index.upsert(id=unique_id, vectors=[embedding], metadata={"source": source, "text": text})
+        embedding = self.model.encode(text).tolist()
+        print('type of embedding is ', type(embedding))
+        print(unique_id, embedding, source)
+        #self.index.upsert(id=unique_id, vectors=embedding, metadata={"source": source, "text": text})
+        self.index.upsert(vectors=[{"id": unique_id, "values":embedding, "metadata":{"source": source, "text": text}}])
 
     def load_and_process_json(self, json_file):
         with open(json_file, 'r', encoding='utf-8') as file:
             data = json.load(file)
+            
 
         for source, text in data.items():
+            print(f"Processing text: {source}")
             if isinstance(text, list):
                 for i, chunk in enumerate(text):
+                    print(i, chunk)
                     self.process_text(source, chunk, i)
+            
             else:
-                self.process_text(source, text, 0)
+                 print(text[0:40])
+                 self.process_text(source, text, 0)
 
+    # def semantic_search(self, query):
+    #     query_embedding = self.model.encode(query).tolist()
+    #     #print(query_embedding)
+    #     results = self.index.query(queries=[query_embedding], top_k=self.top_k)
+        
+    #     return [match["id"] for match in results["matches"]]
     def semantic_search(self, query):
-        query_embedding = self.model.encode(query)
-        results = self.index.query(queries=[query_embedding], top_k=self.top_k)
-        return [match["id"] for match in results["matches"]]
+        try:
+            query_embedding = self.model.encode(query).tolist()
+            results = self.index.query(queries=[query_embedding], top_k=self.top_k)
+            return [match["id"] for match in results["matches"]]
+        except Exception as e:
+            print(f"Error during semantic search: {e}")
+            return []
 
     def generate_response(self, query):
         best_chunk_ids = self.semantic_search(query)
@@ -65,20 +108,26 @@ class RAG:
 
     def integrate_llm(self, prompt):
         try:
-            response = openai.ChatCompletion.create(model=self.llm_engine, messages=[{"role": "system", "content": "You are an expert in this content, helping to explain the text"}, {"role": "user", "content": prompt}])
-            return response.choices[0].message['content']
+            input_ids = self.tokenizer.encode(prompt, return_tensors="pt")
+            response_ids = self.model.generate(input_ids, max_length=self.max_token_length)
+            response_text = self.tokenizer.decode(response_ids[0], skip_special_tokens=True)
+            return response_text
         except Exception as e:
             print(f"Error in generating response: {e}")
-            return None
+            return "An error occurred while generating a response."
 
 # Example usage with command-line argument for specifying the JSON file
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load text data from a JSON file and process with RAG.")
-    parser.add_argument("--json_file", default="default_data.json", help="Path to the JSON file containing text data.")
+    parser.add_argument("--json_file", default="data/extracted_data_2024-04-01_07-59-36.json", help="Path to the JSON file containing text data.")
     args = parser.parse_args()
 
     # Initialize your RAG instance 
-    rag = RAG(pinecone_api_key="your_pinecone_api_key", pinecone_index_name="your_index_name", llm_api_key="your_llm_api_key")
+    rag = RAG()
 
     # Load and process the specified JSON file
-    rag.load_and_process_json(args.json_file)
+    #rag.create_pinecone(args.json_file, rag.pinecone_index_name)
+
+    # Query the pinecone vector storage
+    phrase = 'Submit transcripts and letters of recommendation'
+    results_from_query = rag.semantic_search(phrase)
