@@ -1,0 +1,146 @@
+
+Fall 2021 AIPI Incoming Student Frequently Asked Questions
+CONTENTS BY TOPIC 
+
+Academics
+1. What classes are being offered to AIPI students in Fall 2021? 
+In the Fall semester of the AIPI program students take a fixed schedule of courses (electives are taken in the Spring).  Students should plan to register for the following courses:
+- AIPI 503: Bootcamp [0 units] (On-campus, Online MEng, Online Certificate students)
+- AIPI 510: Sourcing Data for Analytics [3 units] (On-campus, Online MEng, Online Certificate students)
+- AIPI 520: Modeling Process & Algorithms [3 units] (On-campus & Online MEng students)
+- AIPI 530: AI in Practice [3 units] (On-campus students)
+- MENG 570: Business Fundamentals for Engineers [3 units] (On-campus students completing in 12 months)
+- AIPI 501: Industry Seminar Series [0 units] (On-campus & Online MEng students)
+
+The full list of Pratt courses will be made available to students on June 28, 2021, when shopping carts open in DukeHub. 
+
+2. When will the list of Fall 2021 courses be available?
+The list of all Fall 2021 courses offered by the Pratt School of Engineering will be made available to all incoming and continuing students on June 28, 2021, the day that shopping carts open. This list can be accessed using the Simple and Advanced Class Search functions in DukeHub.
+
+3. When can I register for classes?
+Fall 2021 course registration for all graduate students will begin on July 7, 2021, in DukeHub. Students may continue making changes to their schedule during the Drop/Add period, which will end on September 3. After Drop/Add ends, students may no longer change their Fall 2021 schedules in DukeHub.  
+
+4. How do I register for classes?
+All students register for classes through DukeHub, the self-service application that provides students with an array of information and direct access to academic, financial, and personal data. Access to DukeHub is gained using your NetID and password. For assistance with registration, please see the help guides linked here.
+
+
+5. What classes outside of the AIPI curriculum can I count toward my technical electives requirement?
+Approved AIPI electives are listed on the AIPI website.  Additionally, students may take technical electives in other programs and departments across campus with approval from both the course instructor and the AIPI Director. Please note that graduate courses outside of AIPI require an instructor�s permission to enroll, and it is ultimately at the instructor�s discretion to determine whether or not AIPI students will be allowed into a particular class.
+
+6. Can I audit classes? 
+Yes, AIPI students may audit courses on a space-available basis with consent of the instructor and the AIPI Director. Audited courses appear on your transcript and you will receive a grade of AD (indicating successful completion) that will not count toward your GPA. Audited courses do not count toward the fulfillment of AIPI degree requirements.
+
+7. How many classes can I audit per semester?
+AIPI students may audit up to two courses per semester. 
+
+8. How many classes should I register for? 
+In order for international students to remain in compliance with their F-1 visas, they must be registered as a full-time student. For visa purposes, full-time enrollment is considered 9.0 credits per semester (equivalent to three 3.0-credit courses). However, a typical full-time load for AIPI Campus students is 12.0 credits per semester (four 3.0-credit courses). Therefore, full-time residential graduate students pay tuition on a flat-rate, per-semester billing basis and are charged the equivalent of 12.0 credits per semester. Most full-time students enroll in at least 12.0 credits per semester.  AIPI Campus students take a fixed set of 4 courses in Fall semester (AIPI 510,520,530 and MENG 570).  AIPI Online students typically take 2 courses per semester (Fall: AIPI 510,520) and AIPI Certificate students take 1 course/semester (Fall: AIPI 510).  Online students pay tuition on a per-credit basis rather than a flat-rate per-semester basis.
+
+9. What is the limit on credits I can take each semester?
+AIPI students may take up to 15.0 credits per semester. Full-time residential students on the pay-by-semester basis may take a fifth credit for free each semester (although we generally suggest a maximum of 4 courses as the workload can be intense). Students who attempt to enroll in more than 15.0 credits per semester will not be able to register.
+
+10. What is Drop/Add? What happens during the Drop/Add period?
+The Drop/Add period occurs after the initial Registration window and continues until the end of the second week of classes. During the Drop/Add period, students may make changes to their schedules through DukeHub. At the end of the Drop/Add period (September 3, 2021), students� schedules may no longer be changed in DukeHub and can only be changed with permission from their dean.
+
+11. What is the last day that I can register for Fall 2021 classes?
+Students may make changes to their schedule up to the end of the Drop/Add period, which ends on September 3, 2021.
+
+
+12. For Campus students, is there a formal process for selecting between the 12-month and 16-month plan?
+No, there is no specific documentation that must be provided if you choose to extend the AIPI Program to three semesters. However, the earlier you make the decision the better as it will likely affect your selection of courses in Fall and Spring semesters.
+
+13. When do classes start?
+Fall 2021 classes begin on August 23, 2021.
+
+14. What are the class meeting patterns for AIPI courses? 
+Each course typically meets once per week for 2 hours and 45 minutes. 
+
+15. How much time is required outside of class for AIPI courses?
+AIPI classes are challenging and require significant work outside of class. Each week, you should expect to spend between 8-10 hours per course working outside of class.
+
+16. How will classes be offered in Fall 2021 (e.g., all in-person, online, or a mix of the two)?
+While Duke will offer classes fully in-person for the Fall 2021 semester, we understand that the COVID-19 pandemic has created travel and visa challenges for many of our international students. AIPI classes will be offered both in-person and online for the Fall 2021 semester. Students who will be physically located in Durham, NC, USA, for the semester are expected to come to class in-person unless they are isolating or quarantining. Per guidance from the US government, any student on an F-1 visa who began their graduate program after March 2020 must take at least one in-person class per semester to remain in visa compliance. Because AIPI classes will be offered in-person to students who are in Durham, F-1 visaholders in the AIPI Program satisfy this requirement.
+
+17. Where can I find other important dates related to academics?
+The 2021-2022 Duke Academic Calendar can be found here. We strongly recommend students bookmark this page in their browser for easy reference.
+
+18. Where do I find other important information about the AIPI Program?
+The AIPI student website contains a wealth of information about the AIPI program and life at Duke. University policies surrounding academics may also be found on the Office of the University Registrar website.
+
+19. Is there a formal process for designating my elective track? 
+No, there is not currently a formal process to designate your elective track. We do not require students to rigidly adhere to one elective track. Students may choose electives that fit their professional goals. The elective tracks are meant as guides for students to align and develop skills toward a particular area, and those students who complete a track may list it on their resume.
+
+20. What do I do if I want to change my elective track?
+If you wish to change your elective track, there is no formal action that you need to take. However, it is a good idea to speak with the program director about your elective course plans, as they can help steer you toward courses that align with your professional aspirations.
+
+21. How can I track my degree progress?
+Students can track their degree progress using Stellic, a self-service tool that enables students to see which classes they have taken toward their degree and plan for future semesters. Students are strongly encouraged to use Stellic throughout the course of the AIPI Program so that they can stay on track to graduate within the timeframe they choose (two or three semesters).
+
+Tuition and Billing
+22. How much does it cost to audit a course? 
+For AIPI students who pay tuition on a pay-by-semester basis (as is the case for all full-time residential AIPI students), there is no charge for auditing a course. For AIPI Online students who pay tuition on a pay-by-credit basis, there is a charge of $535 per audited course.
+
+23. How are tuition and fees assessed for AIPI students?
+Full-time students in the AIPI Campus Program are automatically set up on a pay-per-semester billing system, meaning they will be charged the equivalent of four separate courses. Students enrolling as AIPI Online and Certificate students will automatically be set up for payments on a per-credit basis. 
+
+24. Can I change my tuition billing basis from per-semester to per-credit?
+Yes, your tuition can be changed from pay-by-semester to pay-by-credit if you are switching to part-time status. (Please note that F-1 visaholders must be enrolled full-time for at least 9.0 credits per semester). If you intend to take less than the typical load (four courses for full-time), please contact Kelsey Liddle (kelsey.liddle@duke.edu), the Pratt Student Records Coordinator, to make this change. The last day for making changes to a student�s billing structure is the last day of Drop/Add in that semester.
+
+25. Is financial aid available to AIPI students? 
+Because the AIPI degree is a professional degree rather than a research degree, most students pay their own tuition costs. For more information on the most common financial aid resources that our students utilize, please click the link here. 
+
+26. I�m not going to be on campus in the Fall 2021 semester due to COVID-19. Do I still have to pay fees?
+If you will not be on campus in the Fall 2021 semester due to COVID-19, please contact Kelsey Liddle (kelsey.liddle@duke.edu), the Pratt Student Records Coordinator, regarding student fees.
+
+Working While a Student
+27. How do I get a Teaching Assistant (TA) position?
+Teaching assistantships are a common way that AIPI students can work on campus, earn money, and give of their time to the AIPI community. Most often, course instructors approach students who have done well in their course and ask them to TA in a subsequent semester. Other times, students will voice their interest to the instructor to initiate the conversation about a TA position. Toward the beginning of each semester, there are usually a few TA positions to be filled, and an announcement about open positions will be emailed out to students. TA positions are not often available for incoming students, as these positions are typically filled by continuing students who have taken the course before.
+
+In order to be on Duke�s payroll, all students must have a Social Security Number on file. Due to COVID-19, processing times for Social Security Number applications have been delayed. If a student intends to work on campus and be paid as an employee of the University, then that student should plan to apply for a Social Security Number. More information about applying for a Social Security Number may be found here. 
+
+28. What other employment positions are available for students on campus? 
+In addition to Teaching Assistantships, AIPI students can work in a variety of roles around campus, such as the campus libraries and various departments within Duke. Some departments have research assistantships as well. These positions are paid at an hourly rate, and some positions are posted and filled just a week or two before classes begin each semester. DukeList is the best place to look for these opportunities, but other opportunities may be advertised via email or word-of-mouth. Please see DukeList for more information.
+
+29. Where can I find information about student employment?
+DukeList is the best place to look for these opportunities, but other opportunities may be advertised via email or word-of-mouth. Please see DukeList for more information.
+
+30. I�m an international student. Can I work off-campus?
+International students on F-1 visas are not permitted to work off-campus except as part of their Curricular Practical Training (CPT). Students who are F-1 visaholders may work in on-campus positions, such as teaching assistantships, but must have a Social Security Number to be on Duke payroll.
+
+Student Services
+31. I don�t want to live alone, but I don�t know anyone else at Duke. How do I find a roommate?
+The onboarding checklist email sent from Bridget Kerwin included a number of resources regarding housing. Two resources of particular note if you are looking for a roommate are DukeList and the International House (I-House) listserv. DukeList is a forum for posting information on a range of topics to other Duke students, faculty, and staff. The I-House listserv is a great list to join if you are newly arrived to Duke and/or Durham and are looking for an apartment, roommate, and/or ride-sharing. 
+
+32. How do I find out about student activities and clubs to participate in?
+There is a wide variety of student activities and clubs to get involved in at Duke.  A partial list of activities/clubs of interest is contained on the AIPI student website.  You are also encouraged to check out the Duke Event Calendar to check out upcoming events in a variety of topics, including the arts, athletics, academics, and civic engagement.
+
+
+For International Students
+33. I am an international student hoping to come to the United States for Fall 2021, but my home country is backlogged with visa applications due to COVID-19. What should I do?
+You have several options to choose from in this situation: (a) defer your enrollment for up to one year; (b) enroll in courses with a hybrid format if you believe you can arrive in the United States within 30 days of the first day of class; or (c) enroll in all online courses, remain in your home country for the Fall 2021 semester, and join us on campus in Spring 2022.
+
+Duke will be offering Fall 2021 courses in a hybrid format, so that students who are unable to travel to the United States are still able to participate in classes and make progress toward their degrees. In the AIPI Program, if you anticipate that you will be able to make it to Durham in time to participate in-person (i.e., by September 22), you should register for the hybrid sections of the courses that you enroll in. You may also enroll in the fully-online section of a course if you know that you will be unable to travel to the United States for the Fall 2021 semester. 
+
+34. I hope to arrive in the United States for Fall 2021 classes, but it might be after drop/add ends. What should I do?
+Students on F-1 visas have until 30 days after the first day of class to arrive in the United States. For Fall 2021, classes begin on August 23, so students must arrive in the United States by September 22. Drop/Add ends on September 3, after which students may not make changes to their Fall 2021 course schedules. Therefore, we recommend that if you anticipate arriving in the United States between September 3 and September 22, you enroll in Fall classes that are being offered according to the Hybrid (i.e., both in-person and online accessible) model. Begin taking these classes online at the beginning of the semester, and if you are able to reach the United States by September 22, you will be able to continue your studies in-person. If you are unable to reach the United States by September 22, you can continue taking your classes online for the Fall 2021 semester.
+
+35. Whom do I contact about other visa questions I may have? 
+In the Duke Visa Services Office, Betty Henderson (betty.henderson@duke.edu) is the Visa Services Advisor for Pratt students. You may also contact Kelsey Liddle (kelsey.liddle@duke.edu), the Pratt Student Records Coordinator, for additional visa-related questions. 
+
+Miscellaneous
+36. How do I get my NetID and password?
+You should receive a separate email from the Office of Information Technology (OIT) with instructions to set up your NetID and email alias. Your NetID is your electronic key to online resources, including your Duke email account, DukeHub, Sakai, MyDuke, Box cloud storage, and more. Please set up your NetID as soon as possible. 
+
+37. When will I get access to my Duke email?
+Once you set up your NetID (see above), you will be able to access your email. This site provides information about how to access your Duke email account. Once you have access to your Duke email, please begin checking and using this address. Your Duke email address will become the primary source for all your communications from Duke.
+
+38. What can I do this summer to prepare for AIPI?
+While some of our students come directly from undergraduate programs which focus heavily on programming and/or math, many students come from other branches of engineering, science or medicine, or join our program after a few years of industry experience. �Spending some time before the Fall semester start brushing up on your programming (Python preferable) and math skills will help make the learning curve a bit easier once classes start. �If you are not comfortable with Python programming and math (calculus, probability and statistics, basic linear algebra), we highly recommend pursuing some independent study before the Bootcamp begins in late July. �To assist you we have compiled�some recommended resources on the AIPI student site.
+
+		
+
+
+
+
+
+

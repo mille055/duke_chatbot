@@ -4,11 +4,11 @@ import io, re, os
 import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, PipelineTool
 import openai
 from pinecone import init, Index, Pinecone, ServerlessSpec
 from dotenv import load_dotenv
-#import logging
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
@@ -27,14 +27,22 @@ class RAG:
         self.verbose = verbose
         self.model = SentenceTransformer(embedding_model)
         self.llm_engine = llm_engine
-        #self.tokenizer = AutoTokenizer.from_pretrained("YourFineTunedModel")
-        #self.model = AutoModelForCausalLM.from_pretrained("YourFineTunedModel")
+        #self.tokenizer = AutoTokenizer.from_pretrained("cindy990915/mistral_7b_duke_chatbot")
+        #self.model = AutoModelForCausalLM.from_pretrained("cindy990915/mistral_7b_duke_chatbot")
         
         
         # Initialize Pinecone client
         self.pc = Pinecone(api_key=self.pinecone_api_key)
         self.index = self.pc.Index(self.pinecone_index_name)
     
+        # # Initialize the LLM model
+        # pipe = pipeline(
+        # "text-generation", 
+        # model = self.model,
+        # device_map="auto"
+        # )
+
+
 
         # Create the Pinecone store
     def create_pinecone(self, json_file, index_name='newindex'):
@@ -149,7 +157,9 @@ class RAG:
         #     print(f"Error in generating response: {e}")
         #     return "An error occurred while generating a response."
 
-        message=[{"role": "assistant", "content": "You are an expert in this content, helping to explain the text"}, {"role": "user", "content": prompt}]
+        message=[{"role": "assistant", "content": "You are a trusted advisor in this content, helping to explain the text to prospective or current students who are seeking answers to questions"}, {"role": "user", "content": prompt}]
+        if self.verbose:
+            print('Debug: message is', message)
         try:
             response = openai.chat.completions.create(
                 model=self.llm_engine,  
