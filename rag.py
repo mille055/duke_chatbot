@@ -27,8 +27,8 @@ class RAG:
         self.verbose = verbose
         self.model = SentenceTransformer(embedding_model)
         self.llm_engine = llm_engine
-        #self.tokenizer = AutoTokenizer.from_pretrained("cindy990915/mistral_7b_duke_chatbot")
-        #self.model = AutoModelForCausalLM.from_pretrained("cindy990915/mistral_7b_duke_chatbot")
+        self.tokenizer = AutoTokenizer.from_pretrained("mille055/duke_chatbot")
+        self.model = AutoModelForCausalLM.from_pretrained("mille055/duke_chatbot")
         
         
         # Initialize Pinecone client
