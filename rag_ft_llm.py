@@ -86,7 +86,7 @@ class RAG:
 
         #Load fintuned model from Hugging face
         self.ft_model_path = "mille055/duke_chatbot0409"
-        self.ft_model = PeftModel.from_pretrained(base_model, ft_model_path)
+        self.ft_model = PeftModel.from_pretrained(self.base_model, self.ft_model_path)
 
 
 
