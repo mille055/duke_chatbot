@@ -16,10 +16,8 @@ import torch
 load_dotenv()
 
 class RAG:
-    def __init__(self, embedding_model='all-MiniLM-L6-v2', llm_engine='gpt-3.5-turbo', model_path = 'mille055/duke_chatbot0409', top_k=3, search_threshold=0.8, max_token_length=512, verbose=False):
-        self.pinecone_api_key = os.getenv('PINECONE_API_KEY')
-        self.pinecone_index_name = os.getenv('PINECONE_INDEX_NAME')
-        self.llm_api_key = os.getenv('OPENAI_API_KEY')
+    def __init__(self, embedding_model='all-MiniLM-L6-v2', llm_engine='gpt-3.5-turbo', model_path = 'mille055/duke_chatbot0409', top_k=3, search_threshold=0.8, max_token_length=512, openaikey = None, pineconekey = None, pineconeindex = 'newindex', verbose=False):
+       
         self.embedding_model = embedding_model
         self.chunk_size = 500
         self.overlap = 25
@@ -33,7 +31,20 @@ class RAG:
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_path)
         
-        
+        # initialize api keys
+        if not pineconekey:
+            try:
+                self.pinecone_api_key = os.getenv('PINECONE_API_KEY')
+            except:
+                print('no pinecone key')
+        if not openaikey:
+            try:
+                self.llm_api_key = os.getenv('OPENAI_API_KEY') 
+            except:
+                print('no openai key provided')        
+        self.pinecone_index_name = pineconeindex
+           
+
         # Initialize Pinecone client
         self.pc = Pinecone(api_key=self.pinecone_api_key)
         self.index = self.pc.Index(self.pinecone_index_name)
