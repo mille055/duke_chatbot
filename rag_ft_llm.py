@@ -32,12 +32,17 @@ class RAG:
         self.model = AutoModelForCausalLM.from_pretrained(self.model_path)
         
         # initialize api keys
-        if not pineconekey:
+        if pineconekey:
+            self.pinecone_api_key = pineconekey
+        else: 
             try:
                 self.pinecone_api_key = os.getenv('PINECONE_API_KEY')
             except:
                 print('no pinecone key')
-        if not openaikey:
+                
+        if openaikey: 
+            self.llm_api_key = openaikey
+        else:
             try:
                 self.llm_api_key = os.getenv('OPENAI_API_KEY') 
             except:
