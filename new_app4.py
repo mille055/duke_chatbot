@@ -1,5 +1,5 @@
 import streamlit as st
-from rag_ft_llm import RAG
+from rag import RAG
 import os
 from dotenv import load_dotenv
 
