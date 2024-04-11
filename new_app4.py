@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize RAG with environment variables or directly with your keys
-rag = RAG()
+rag = RAG(pinecone_index_name='chatbot0411')
 
 # Streamlit page configuration
 st.set_page_config(page_title="Duke AIPI Chatbot", layout="wide")

@@ -15,7 +15,7 @@ import logging
 load_dotenv()
 
 class RAG:
-    def __init__(self, embedding_model='all-MiniLM-L6-v2', openai_embedding_model = 'text-embedding-3-small', llm_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = 'newindex', verbose=False):
+    def __init__(self, embedding_model='all-MiniLM-L6-v2', openai_embedding_model = 'text-embedding-3-small', llm_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = 'dukechatbot0411', verbose=False):
         self.pinecone_api_key = os.getenv('PINECONE_API_KEY')
         self.pinecone_index_name = pinecone_index_name
         self.llm_api_key = os.getenv('OPENAI_API_KEY')
@@ -56,7 +56,7 @@ class RAG:
         
         # Initialize Pinecone client
         self.pc = Pinecone(api_key=self.pinecone_api_key)
-        print('pinecone indices', self.pc.list_indexes())
+        #print('pinecone indices', self.pc.list_indexes())
         if self.pinecone_index_name in self.pc.list_indexes().names():
             self.index = self.pc.Index(self.pinecone_index_name)
         else:
@@ -70,7 +70,7 @@ class RAG:
                     )
             )
     
-        # Create the Pinecone store
+    # Create the Pinecone store
     def create_pinecone(self, json_file):
         
         if self.pinecone_index_name in self.pc.list_indexes().names():
@@ -229,17 +229,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Initialize your RAG instance 
-    rag = RAG(chunk_overlap=25, chunk_size = 500, pinecone_index_name='dukechatbot0411')
+    rag = RAG(pinecone_index_name='dukechatbot0411')
 
     # Load and process the specified JSON file for creating the vector db. 
     # Not necessary if already created
     
-    rag.create_pinecone(args.json_file)
+    #rag.create_pinecone(args.json_file)
 
     # Query the pinecone vector storage
-    #phrase = 'Submit transcripts and letters of recommendation'
-    #texts, sources = rag.semantic_search(phrase)
-    #print(texts)
+    phrase = 'who is telford?'
+    texts, sources = rag.semantic_search(phrase)
+    print(texts)
 
     #llm_response, sources = rag.generate_response(phrase)
     #print(llm_response)
