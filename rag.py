@@ -15,10 +15,15 @@ import logging
 load_dotenv()
 
 class RAG:
-    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = 'dukechatbot0411', use_gpt = True, verbose=False):
+    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, default_pinecone_index_name = 'dukechatbot0411', pinecone_index_name = None, llm_url = None, use_gpt = True, verbose=False):
         #pinecone
-        self.pinecone_api_key = os.getenv('PINECONE_API_KEY')
-        self.pinecone_index_name = pinecone_index_name
+        self.pinecone_api_key = os.getenv('PINECONE_API_KEY')     
+        # index: can pass index or get environment variable; if none, use default
+        if pinecone_index_name:
+            self.pinecone_index_name = pinecone_index_name
+        else:
+            self.pinecone_index_name = os.getenv('PINECONE_INDEX_NAME', default_pinecone_index_name)
+
         #openai
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
         self.openai_embedding_model = openai_embedding_model
@@ -33,11 +38,15 @@ class RAG:
         self.max_token_length = max_token_length
         self.verbose = verbose
 
-        # our model    
-        self.llm_url = None
-        self.llm_token = None
+        # our model 
+        if llm_url:
+            self.llm_url = llm_url
+        else:
+            self.llm_url = os.getenv('LLM_URL', 'https://d4tk8jf5ze3gkk9x.us-east-1.aws.endpoints.huggingface.cloud')   
 
-    
+        self.llm_token = os.getenv('HUGGINGFACE_TOKEN')
+
+
         self.text_to_replace = ["© Copyright 2011-2024 Duke University * __Main Menu * __Why Duke? * __The Duke Difference * __Career Services * __Graduate Outcomes * __What Tech Leaders Are Saying * __Degree * __Courses * __Faculty * __Advisory Board * __Apply * __Quick Links * __News * __Events * __Steering Committee * __Contact *",
                    "Jump to navigation * Duke Engineering * Pratt School of Engineering * Institute for Enterprise Engineering * News * Events * Steering Committee * Contact __ * Why Duke? * The Duke Difference * Career Services * Graduate Outcomes * What Tech Leaders Are Saying * Degree * Courses * Faculty * Advisory Board * Apply __",
                    "Skip to main content * Departments & Centers * Overview * Biomedical Engineering * Civil & Environmental Engineering * Electrical & Computer Engineering * Mechanical Engineering & Materials Science * Institute for Enterprise Engineering * Alumni & Parents * Overview * Alumni * Parents * Giving * Board of Visitors * Our History * Email Newsletter * Meet the Team * Corporate Partners * Overview * Partners & Sponsors * Data Science & AI Industry Affiliates * Connect With Students * Recruiting Our Students * Sponsored Research * TechConnect Career Networking * Apply * Careers * Directory * Undergraduate * 1. For Prospective Students 1. Majors & Minors 2. Certificates 3. General Degree Requirements 4. 4+1: BSE+Master's Degree 5. Campus Tours 6. How to Apply 2. First-Year Design 3. Student Entrepreneurship 4. Undergraduate Research 5. Where Our Undergrads Go 6. Diversity, Equity & Inclusion 7. For Current Students 1. The First Year 2. Advising 3. Student Clubs & Teams 4. Graduation with Distinction 5. Internships 6. Policies & Procedures * Graduate * 1. For Prospective Students 1. PhD Programs 2. Master's Degrees 3. Online Specializations, Certificates and Short Courses 4. Admissions Events 5. How to Apply 2. For Admitted Students 3. Diversity, Equity & Inclusion 1. Bootcamp for Applicants 2. Recruiting Incentives 4. For Current Grad Students 1. Graduate Student Programs & Services * Faculty & Research * 1. Faculty 1. Faculty Profiles 2. New Faculty 3. Awards and Recognition 4. NAE Members 2. Research 1. Signature Research Themes 2. Recent External Funding Awards 3. Faculty Entrepreneurship 4. Duke Engineering Discoveries * About * 1. Dean's Welcome 2. Campus & Tours 3. Facts & Rankings 4. Diversity, Equity & Inclusion 5. Service to Society 6. Entrepreneurship 7. Governance 8. News & Media 1. Latest News 2. Podcast 3. Email Newsletter 4. Publications 5. Media Coverage 6. Public Health Information 9. Events 1. Events Calendar 2. Academic Calendar 3. Commencement 10. Art @ Duke Engineering",
@@ -61,7 +70,6 @@ class RAG:
         
         # Initialize Pinecone client
         self.pc = Pinecone(api_key=self.pinecone_api_key)
-        #print('pinecone indices', self.pc.list_indexes())
         if self.pinecone_index_name in self.pc.list_indexes().names():
             self.index = self.pc.Index(self.pinecone_index_name)
         else:
