@@ -15,24 +15,29 @@ import logging
 load_dotenv()
 
 class RAG:
-    def __init__(self, embedding_model='all-MiniLM-L6-v2', openai_embedding_model = 'text-embedding-3-small', llm_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = 'dukechatbot0411', verbose=False):
+    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = 'dukechatbot0411', use_gpt = True, verbose=False):
+        #pinecone
         self.pinecone_api_key = os.getenv('PINECONE_API_KEY')
         self.pinecone_index_name = pinecone_index_name
-        self.llm_api_key = os.getenv('OPENAI_API_KEY')
-        self.embedding_model = embedding_model
+        #openai
+        self.openai_api_key = os.getenv('OPENAI_API_KEY')
         self.openai_embedding_model = openai_embedding_model
+        self.openai_engine = openai_engine
+        self.openai_client =  OpenAI(api_key=self.openai_api_key)
+        self.use_gpt = use_gpt
+        #text chunking and semantic search
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.top_k = top_k
         self.search_threshold = search_threshold
         self.max_token_length = max_token_length
         self.verbose = verbose
-        #self.model = SentenceTransformer(embedding_model)
-        self.llm_engine = llm_engine
-        self.openai_client =  OpenAI(api_key=self.llm_api_key)
 
-        # self.tokenizer = AutoTokenizer.from_pretrained("mille055/duke_chatbot")
-        # self.model = AutoModelForCausalLM.from_pretrained("mille055/duke_chatbot")
+        # our model    
+        self.llm_url = None
+        self.llm_token = None
+
+    
         self.text_to_replace = ["© Copyright 2011-2024 Duke University * __Main Menu * __Why Duke? * __The Duke Difference * __Career Services * __Graduate Outcomes * __What Tech Leaders Are Saying * __Degree * __Courses * __Faculty * __Advisory Board * __Apply * __Quick Links * __News * __Events * __Steering Committee * __Contact *",
                    "Jump to navigation * Duke Engineering * Pratt School of Engineering * Institute for Enterprise Engineering * News * Events * Steering Committee * Contact __ * Why Duke? * The Duke Difference * Career Services * Graduate Outcomes * What Tech Leaders Are Saying * Degree * Courses * Faculty * Advisory Board * Apply __",
                    "Skip to main content * Departments & Centers * Overview * Biomedical Engineering * Civil & Environmental Engineering * Electrical & Computer Engineering * Mechanical Engineering & Materials Science * Institute for Enterprise Engineering * Alumni & Parents * Overview * Alumni * Parents * Giving * Board of Visitors * Our History * Email Newsletter * Meet the Team * Corporate Partners * Overview * Partners & Sponsors * Data Science & AI Industry Affiliates * Connect With Students * Recruiting Our Students * Sponsored Research * TechConnect Career Networking * Apply * Careers * Directory * Undergraduate * 1. For Prospective Students 1. Majors & Minors 2. Certificates 3. General Degree Requirements 4. 4+1: BSE+Master's Degree 5. Campus Tours 6. How to Apply 2. First-Year Design 3. Student Entrepreneurship 4. Undergraduate Research 5. Where Our Undergrads Go 6. Diversity, Equity & Inclusion 7. For Current Students 1. The First Year 2. Advising 3. Student Clubs & Teams 4. Graduation with Distinction 5. Internships 6. Policies & Procedures * Graduate * 1. For Prospective Students 1. PhD Programs 2. Master's Degrees 3. Online Specializations, Certificates and Short Courses 4. Admissions Events 5. How to Apply 2. For Admitted Students 3. Diversity, Equity & Inclusion 1. Bootcamp for Applicants 2. Recruiting Incentives 4. For Current Grad Students 1. Graduate Student Programs & Services * Faculty & Research * 1. Faculty 1. Faculty Profiles 2. New Faculty 3. Awards and Recognition 4. NAE Members 2. Research 1. Signature Research Themes 2. Recent External Funding Awards 3. Faculty Entrepreneurship 4. Duke Engineering Discoveries * About * 1. Dean's Welcome 2. Campus & Tours 3. Facts & Rankings 4. Diversity, Equity & Inclusion 5. Service to Society 6. Entrepreneurship 7. Governance 8. News & Media 1. Latest News 2. Podcast 3. Email Newsletter 4. Publications 5. Media Coverage 6. Public Health Information 9. Events 1. Events Calendar 2. Academic Calendar 3. Commencement 10. Art @ Duke Engineering",
@@ -200,28 +205,35 @@ class RAG:
         # except Exception as e:
         #     print(f"Error in generating response: {e}")
         #     return "An error occurred while generating a response."
-
-        message=[{"role": "assistant", "content": "You are a trusted advisor in this content, helping to explain the text to prospective or current students who are seeking answers to questions"}, {"role": "user", "content": prompt}]
-        if self.verbose:
-            print('Debug: message is', message)
-        try:
-            response = openai.chat.completions.create(
-                model=self.llm_engine,  
-                messages=message,
-                max_tokens=250,  
-                temperature=0.1  
-            )
-            # Extracting the content from the response
-            chat_message = response.choices[0].message
+        if self.use_gpt:
+            message=[{"role": "assistant", "content": "You are a trusted advisor in this content, helping to explain the text to prospective or current students who are seeking answers to questions"}, {"role": "user", "content": prompt}]
             if self.verbose:
-                print(chat_message)
-            return chat_message.content
+                print('Debug: message is', message)
+            try:
+                response = self.openai_client.chat.completions.create(
+                    model=self.openai_engine,  
+                    messages=message,
+                    max_tokens=300,  
+                    temperature=0.1  
+                )
+                # Extracting the content from the response
+                chat_message = response.choices[0].message.content
+                if self.verbose:
+                    print(chat_message)
+     
+                return chat_message
     
-        except Exception as e:
-            print(f"Error in generating response: {e}")
-            return None
+            except Exception as e:
+                print(f"Error in generating response: {e}")
+                return None
         
-
+        else:
+            try:
+                response = self.llm_url(prompt, token = self.llm_token)
+                return response
+            except:
+                return None
+            
 # Example usage with command-line argument for specifying the JSON file
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load text data from a JSON file and process with RAG.")
@@ -229,7 +241,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Initialize your RAG instance 
-    rag = RAG(pinecone_index_name='dukechatbot0411')
+    rag = RAG()
 
     # Load and process the specified JSON file for creating the vector db. 
     # Not necessary if already created
@@ -241,6 +253,6 @@ if __name__ == "__main__":
     texts, sources = rag.semantic_search(phrase)
     print(texts)
 
-    #llm_response, sources = rag.generate_response(phrase)
-    #print(llm_response)
-    #print('learn more by clicking', sources[0])
+    llm_response, sources = rag.generate_response(phrase)
+    print(llm_response)
+    print('learn more by clicking', sources[0])

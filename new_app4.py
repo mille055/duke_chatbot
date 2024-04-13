@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize RAG with environment variables or directly with your keys
-rag = RAG(pinecone_index_name='chatbot0411')
+rag = RAG()
 
 # Streamlit page configuration
 st.set_page_config(page_title="Duke AIPI Chatbot", layout="wide")
@@ -21,6 +21,7 @@ def user_message(message):
     st.markdown(f'<div class="user-message" style="display: flex; padding: 5px;">'
                 f'<div style="background-color: #00539B; color: white; padding: 10px; border-radius: 10px; font-size:18px; margin-bottom:10px; margin-left:15px;">{message}</div>'
                 f'</div>', unsafe_allow_html=True)
+
 
 
 def run_UI():
@@ -62,6 +63,7 @@ def run_UI():
     
     #st.image('assets/duke_chapel_blue_with_text.png', caption='Duke University')
     st.image('assets/mashup_duke_image_title.png', caption='Duke University')
+
 
     # Initialize or retrieve the conversation history from the session state
     if 'conversation_history' not in st.session_state:
