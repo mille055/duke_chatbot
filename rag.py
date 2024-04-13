@@ -15,14 +15,14 @@ import logging
 load_dotenv()
 
 class RAG:
-    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, default_pinecone_index_name = 'dukechatbot0411', pinecone_index_name = None, llm_url = None, use_gpt = True, verbose=False):
+    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = None, llm_url = None, use_gpt = True, verbose=True):
         #pinecone
         self.pinecone_api_key = os.getenv('PINECONE_API_KEY')     
         # index: can pass index or get environment variable; if none, use default
         if pinecone_index_name:
             self.pinecone_index_name = pinecone_index_name
         else:
-            self.pinecone_index_name = os.getenv('PINECONE_INDEX_NAME', default_pinecone_index_name)
+            self.pinecone_index_name = os.getenv('PINECONE_INDEX_NAME', 'dukechatbot0411')
 
         #openai
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -67,29 +67,21 @@ class RAG:
                    "Skip to main content * Duke University * Pratt School of Engineering * Apply Online * Visit * Contact __ * About * Is Duke Right for Me? * About the MEng Degree at Duke * Courses and Curriculum * Internship/Project * Career Services & Outcomes * Options for Current Duke Students * Non-Degree Candidates * Apply * How to Apply * Connect With Us * Visit Duke * Application Requirements * Application Deadlines * Apply Online * Tuition and Financial Aid __",
                    "© Copyright 2011-2024 Duke University * __Main Menu * __About * __Is Duke Right for Me? * __About the MEng Degree at Duke * __Courses and Curriculum * __Internship/Project * __Career Services & Outcomes * __Options for Current Duke Students * __Non-Degree Candidates * __Apply * __How to Apply * __Connect With Us * __Visit Duke * __Application Requirements * __Uploading a Transcript * __Grade Scale * __Short Answer Essays * __Resume * __Recommendations * __GRE Scores * __English Language Testing * __Application Fee * __Interview/Video Introduction * __Minimum Application Requirements * __International Applicants * __Deposit for Enrolling Students * __Submitting Final Transcripts * __Application Deadlines * __Apply Online * __Tuition and Financial Aid * __Quick Links * __Apply Online * __Visit * __Contact *"]
 
-        
+    
         # Initialize Pinecone client
         self.pc = Pinecone(api_key=self.pinecone_api_key)
         if self.pinecone_index_name in self.pc.list_indexes().names():
             self.index = self.pc.Index(self.pinecone_index_name)
         else:
-            self.pc.create_index(
-                name = self.pinecone_index_name,
-                dimension = 1536,
-                metric="cosine",
-                spec=ServerlessSpec(
-                    cloud="aws",
-                    region="us-west-2"
-                    )
-            )
+            self.create_pinecone()
     
     # Create the Pinecone store
-    def create_pinecone(self, json_file):
+    def create_pinecone(self):
         
-        if self.pinecone_index_name in self.pc.list_indexes().names():
-            self.pc.delete_index(self.pinecone_index_name)
+        if self.pinecone_index_name not in self.pc.list_indexes().names():
+            
             #self.index = self.pc.Index(self.pinecone_index_name)
-        self.pc.create_index(
+            self.pc.create_index(
                 name=self.pinecone_index_name,
                 dimension= 1536,
                 metric="cosine",
@@ -98,8 +90,17 @@ class RAG:
                     region="us-west-2"
                     )
                 )
+            if self.verbose:
+                print('Created new pinecone index named', self.pinecone_index_name)
         self.index = self.pc.Index(self.pinecone_index_name)
+        #self.load_and_process_json(json_file)
+
+    def clear_pinecone(self, index_to_clear):
+        self.pc.delete_index(index_to_clear)
+
+    def populate_pinecone(self, json_file):
         self.load_and_process_json(json_file)
+
 
     def chunk_text(self, text):
         """
@@ -145,8 +146,9 @@ class RAG:
             )
         embedding = response.data[0].embedding
         #client.embeddings.create(input = [text], model=model).data[0].embedding
-        print('type of embedding is ', type(embedding))
-        print(unique_id, embedding, source)
+        if self.verbose:
+            print('type of embedding is ', type(embedding))
+            print(unique_id, embedding, source)
         #self.index.upsert(id=unique_id, vectors=embedding, metadata={"source": source, "text": text})
         self.index.upsert(vectors=[{"id": unique_id, "values":embedding, "metadata":{"source": source, "text": text}}])
 
