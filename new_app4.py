@@ -55,8 +55,12 @@ def run_UI():
                 float: left;
                 clear: both;
         }
+        .stChatInputContainer input:focus {
+            border-color: #012169;
+        }
         .st-checkbox label span {
             background-color: #012169;
+            border-color: #012169;
         }
         </style>
     """, unsafe_allow_html=True)
