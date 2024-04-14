@@ -114,7 +114,7 @@ def run_UI():
             if sources:
                 st.markdown(f"<div style='text-align: right;'><a href='{sources[0]}' target='_blank'><button style='background-color: #3F7D7B; color: white; padding: 10px 24px; margin: 10px; border: none; border-radius: 12px; cursor: pointer;'>View Source</button></a></div>", unsafe_allow_html=True)
 
-            st.markdown(f"<div style='text-align: right;'><a href='https://github.com/mille055/duke_chatbot/tree/main/assets/AIPI-Incoming-Student-FAQ.docx' target='_blank'><button style='background-color: #3F7D7B; color: white; padding: 10px 24px; margin: 10px; border: none; border-radius: 12px; cursor: pointer;'>View FAQs</button></a></div>", unsafe_allow_html=True)
+            #st.markdown(f"<div style='text-align: right;'><a href='https://github.com/mille055/duke_chatbot/tree/main/assets/AIPI-Incoming-Student-FAQ.docx' target='_blank'><button style='background-color: #3F7D7B; color: white; padding: 10px 24px; margin: 10px; border: none; border-radius: 12px; cursor: pointer;'>View FAQs</button></a></div>", unsafe_allow_html=True)
 
             # if st.button('Try another way'): # and not st.session_state.use_gpt:  # If using HuggingFace and want to offer GPT alternative
             #     st.session_state.button_clicked = True
