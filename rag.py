@@ -252,7 +252,38 @@ class RAG:
             except Exception as e:
                 print(f"Error in connecting to the HuggingFace API: {e}")
                 return None
-            
+
+
+    # def get_similar_faq(self, query, index_name="faq-database", threshold=0.4):
+    #     print('get similar faq running with text', query)
+    #     try:
+    #         # Initialize Pinecone client
+    #         faq_pc = Pinecone(self.pinecone_api_key)
+    #         print('set up pinecone client')
+    #         # Get the index
+    #         faq_index = faq_pc.Index(index_name)
+    #         print('the pinecone index is ', index_name)
+
+    #         # Embed the query using OpenAI's embedding API
+    #         response = self.openai_client.embeddings.create(
+    #             model=self.openai_embedding_model,
+    #             input=[query]
+    #             )
+    #         query_embedding = response['data'][0]['embedding']
+    #         print('query_embedding finished.', query_embedding)
+    #         # Query the vector index
+    #         results = faq_index.query(vector=query_embedding, top_k=1, include_metadata=True)
+    #         matches = results["matches"]
+    #         print('matches:', matches)
+    #         if matches and matches[0]["score"] >= threshold:
+    #             return matches[0]["metadata"]["answer"]
+    #         else:
+    #             return None
+
+    #     except Exception as e:
+    #         print(f"Error: {e}")
+    #         return None
+
 # Example usage with command-line argument for specifying the JSON file
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load text data from a JSON file and process with RAG.")
@@ -260,7 +291,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Initialize your RAG instance 
-    #rag = RAG(verbose=True, pinecone_index_name='dukechatbot0413')
+    rag = RAG(verbose=True, pinecone_index_name='dukechatbot0413')
     #rag.populate_pinecone('data/extracted_data_2024-04-01_07-59-36.json')
 
     # Load and process the specified JSON file for creating the vector db. 
@@ -271,6 +302,8 @@ if __name__ == "__main__":
     phrase = 'who is telford?'
     texts, sources = rag.semantic_search(phrase)
     print(texts)
+    #similar_faq = rag.get_similar_faq(phrase)
+    #print(similar_faq)
 
     llm_response, sources = rag.generate_response(phrase)
     print(llm_response)
