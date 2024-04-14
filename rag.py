@@ -9,20 +9,21 @@ from openai import OpenAI
 from pinecone import init, Index, Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 import logging
+import requests
 #import texthero as hero
 
 # Load environment variables from .env file
 load_dotenv()
 
 class RAG:
-    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = None, llm_url = None, use_gpt = True, verbose=True):
+    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = None, llm_url = None, use_gpt = False, verbose=True):
         #pinecone
         self.pinecone_api_key = os.getenv('PINECONE_API_KEY')     
         # index: can pass index or get environment variable; if none, use default
         if pinecone_index_name:
             self.pinecone_index_name = pinecone_index_name
         else:
-            self.pinecone_index_name = os.getenv('PINECONE_INDEX_NAME', 'dukechatbot0411')
+            self.pinecone_index_name = os.getenv('PINECONE_INDEX_NAME', 'dukechatbot0413')
 
         #openai
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -36,14 +37,14 @@ class RAG:
         self.top_k = top_k
         self.search_threshold = search_threshold
         self.max_token_length = max_token_length
+        self.prompt_instruction = prompt_instruction = "Please summarize the text to prospective students who are seeking answers to questions. Please be informative and helpful, and summarize the context rather than repeating it word for word. Here is some context and the question: "
         self.verbose = verbose
 
         # our model 
         if llm_url:
             self.llm_url = llm_url
         else:
-            self.llm_url = os.getenv('LLM_URL', 'https://d4tk8jf5ze3gkk9x.us-east-1.aws.endpoints.huggingface.cloud')   
-
+            self.llm_url = os.getenv('LLM_URL', 'https://ej0lhmgikhbq6zp9.us-east-1.aws.endpoints.huggingface.cloud')
         self.llm_token = os.getenv('HUGGINGFACE_TOKEN')
 
 
@@ -65,7 +66,8 @@ class RAG:
                    "Page Not Found We're sorry, but that page was not found. Please check the spelling of the page address or search this website. * * * * * © Copyright 2011-2024 Duke University drupal_block( 'search_form_block', { label_display: false } ) * Undergraduate * Overview * Degree Programs * BSE Degree Planning * ME/BME Double Major * Certificates * Aerospace Engineering * Energy & the Environment * Materials Science & Engineering * 4+1: BSE+Master's * Courses * For Applicants * Why Duke MEMS? * Where Our Students Go * Enrollment and Graduation Rates * For Current Students * Awards & Honors * Graduation with Distinction * Independent Study * Senior Design * Master's * Earn Your Master's at Duke * Admissions * Degrees * Master of Science * Master of Engineering * Concentrations * Certificates * Aerospace Graduate Certificate * Courses * Career Outcomes * Life at Duke * MEMS Graduate Student Committee * PhD * Earn Your PhD at Duke * PhD Admissions * Certificates, Fellowships & Training Programs * Courses * Career Outcomes * Meet Our PhD Students * MEMS Graduate Student Committee * Research * Overview * Aero * Autonomy * Bio * Computing / AI * Energy * Soft / Nano * Research Facilities * Faculty * All Faculty * Awards & Recognition * About * Welcome to Duke MEMS * Meet the Alstadt Chair * Meet the Staff * Facts & Stats * Diversity, Equity, Inclusion & Community * News * Media Coverage * Email Newsletter * Research News * All Events * Pearsall Lecture Series * Seminars * Our History * Driving Directions",
                    "© Copyright 2011-2024 Duke University drupal_block( 'search_form_block', { label_display: false } ) * Undergraduate * Overview * Degree Programs * BSE Degree Planning * ME/BME Double Major * Certificates * Aerospace Engineering * Energy & the Environment * Materials Science & Engineering * 4+1: BSE+Master's * Courses * For Applicants * Why Duke MEMS? * Where Our Students Go * Enrollment and Graduation Rates * For Current Students * Awards & Honors * Graduation with Distinction * Independent Study * Senior Design * Master's * Earn Your Master's at Duke * Admissions * Degrees * Master of Science * Master of Engineering * Concentrations * Certificates * Aerospace Graduate Certificate * Courses * Career Outcomes * Life at Duke * MEMS Graduate Student Committee * PhD * Earn Your PhD at Duke * PhD Admissions * Certificates, Fellowships & Training Programs * Courses * Career Outcomes * Meet Our PhD Students * MEMS Graduate Student Committee * Research * Overview * Aero * Autonomy * Bio * Computing / AI * Energy * Soft / Nano * Research Facilities * Faculty * All Faculty * Awards & Recognition * About * Welcome to Duke MEMS * Meet the Alstadt Chair * Meet the Staff * Facts & Stats * Diversity, Equity, Inclusion & Community * News * Media Coverage * Email Newsletter * Research News * All Events * Pearsall Lecture Series * Seminars * Our History * Driving Directions",
                    "Skip to main content * Duke University * Pratt School of Engineering * Apply Online * Visit * Contact __ * About * Is Duke Right for Me? * About the MEng Degree at Duke * Courses and Curriculum * Internship/Project * Career Services & Outcomes * Options for Current Duke Students * Non-Degree Candidates * Apply * How to Apply * Connect With Us * Visit Duke * Application Requirements * Application Deadlines * Apply Online * Tuition and Financial Aid __",
-                   "© Copyright 2011-2024 Duke University * __Main Menu * __About * __Is Duke Right for Me? * __About the MEng Degree at Duke * __Courses and Curriculum * __Internship/Project * __Career Services & Outcomes * __Options for Current Duke Students * __Non-Degree Candidates * __Apply * __How to Apply * __Connect With Us * __Visit Duke * __Application Requirements * __Uploading a Transcript * __Grade Scale * __Short Answer Essays * __Resume * __Recommendations * __GRE Scores * __English Language Testing * __Application Fee * __Interview/Video Introduction * __Minimum Application Requirements * __International Applicants * __Deposit for Enrolling Students * __Submitting Final Transcripts * __Application Deadlines * __Apply Online * __Tuition and Financial Aid * __Quick Links * __Apply Online * __Visit * __Contact *"]
+                   "© Copyright 2011-2024 Duke University * __Main Menu * __About * __Is Duke Right for Me? * __About the MEng Degree at Duke * __Courses and Curriculum * __Internship/Project * __Career Services & Outcomes * __Options for Current Duke Students * __Non-Degree Candidates * __Apply * __How to Apply * __Connect With Us * __Visit Duke * __Application Requirements * __Uploading a Transcript * __Grade Scale * __Short Answer Essays * __Resume * __Recommendations * __GRE Scores * __English Language Testing * __Application Fee * __Interview/Video Introduction * __Minimum Application Requirements * __International Applicants * __Deposit for Enrolling Students * __Submitting Final Transcripts * __Application Deadlines * __Apply Online * __Tuition and Financial Aid * __Quick Links * __Apply Online * __Visit * __Contact *",
+                   "| Duke AI Master of Engineering",  "Jump to navigation",  "Enginerring Industry Relations Leadership News Contact Why Duke?",  "The Duke Difference Career Services Graduate Outcomes What Tech Leaders Are Saying Degree Certificate Courses Faculty Apply", "Engineering Industry Relations Leadership News Contact Why Duke?", "Context:"]
 
     
         # Initialize Pinecone client
@@ -108,33 +110,26 @@ class RAG:
         trying to split at sentence endings when possible.
 
         Args:
-            text_dict (dict): Dictionary with page numbers as keys and text as values.
-            max_length (int): Maximum length of each chunk.
-            overlap (int): Number of characters to overlap between chunks.
+            self
+            text (str): The input text.
+        
 
         Returns:
-            chunks (list of str): Chunks of text
+            chunks (list of str): Chunks of text.
         """
-        overlap = self.chunk_overlap
-       
         chunks = []
         current_chunk = ""
-        sentences = re.split(r'(?<=[.!?]) +', text)
+        sentences = re.split(r'(?<=[.!?])\s+', text)
         for sentence in sentences:
-            print(sentence)
             if len(current_chunk) + len(sentence) > self.chunk_size and current_chunk:
                 chunks.append(current_chunk)
-                current_chunk = current_chunk[-overlap:]        
-            current_chunk += sentence + ' '
-
+                current_chunk = current_chunk[-self.chunk_overlap:] + ' ' + sentence
+            else:
+                current_chunk += sentence + ' '
 
         if current_chunk:
             chunks.append(current_chunk)
-            current_chunk = ""
-        if not chunks:
-            print('no chunks')
-        else:
-            print('chunking text with the first being', chunks[0])
+
         return chunks
 
     def process_text(self, source, text, chunk_id):
@@ -146,27 +141,26 @@ class RAG:
             )
         embedding = response.data[0].embedding
         #client.embeddings.create(input = [text], model=model).data[0].embedding
-        if self.verbose:
-            print('type of embedding is ', type(embedding))
-            print(unique_id, embedding, source)
+        # if self.verbose:
+        #     print('type of embedding is ', type(embedding))
+        #     print(unique_id, embedding, source)
         #self.index.upsert(id=unique_id, vectors=embedding, metadata={"source": source, "text": text})
         self.index.upsert(vectors=[{"id": unique_id, "values":embedding, "metadata":{"source": source, "text": text}}])
 
     def load_and_process_json(self, json_file):
         with open(json_file, 'r', encoding='utf-8') as file:
             data = json.load(file)
-            
-
         for source, text in data.items():
             print(f"Processing text: {source}")
             # cleaning text
             for phrase in self.text_to_replace:
                 text = text.replace(phrase, " ")
-
+                if self.verbose:
+                    print('replacing phrase', phrase)
             chunks = self.chunk_text(text)
             if isinstance(chunks, list):
                 for i, chunk in enumerate(chunks):
-                    print(i, chunk)
+                    #print(i, chunk)
                     self.process_text(source, chunk, i)
             
             else:
@@ -202,7 +196,9 @@ class RAG:
         texts, sources = self.semantic_search(query)
         if texts:
             combined_chunks = " ".join(texts)
-            return (self.integrate_llm(combined_chunks + "\n" + query), sources)
+            prompt = self.prompt_instruction + "\n Context: " + combined_chunks + "\nUser Query:\n\n {} ###\n\n".format(query)
+            #prompt = prompt[:1024]
+            return (self.integrate_llm(prompt), sources)
         else:
             return ("Sorry, I couldn't find a relevant response.", None)
 
@@ -216,9 +212,10 @@ class RAG:
         #     print(f"Error in generating response: {e}")
         #     return "An error occurred while generating a response."
         if self.use_gpt:
-            message=[{"role": "assistant", "content": "You are a trusted advisor in this content, helping to explain the text to prospective or current students who are seeking answers to questions"}, {"role": "user", "content": prompt}]
+            message=[{"role": "assistant", "content": "You are a trusted advisor helping to explain the text to prospective or current students who are seeking answers to questions"}, {"role": "user", "content": prompt}]
             if self.verbose:
                 print('Debug: message is', message)
+                print('using gpt is : ', self.use_gpt)
             try:
                 response = self.openai_client.chat.completions.create(
                     model=self.openai_engine,  
@@ -238,10 +235,27 @@ class RAG:
                 return None
         
         else:
+
+            # Using the custom LLM HuggingFace endpoint
+            headers = {
+                "Authorization": f"Bearer {self.llm_token}"
+            }
+            payload = {
+                "inputs": prompt
+            }
             try:
-                response = self.llm_url(prompt, token = self.llm_token)
-                return response
-            except:
+                response = requests.post(self.llm_url, headers=headers, json=payload)
+                response_data = response.json()
+                response_text = response_data[0].get("generated_text", "No response generated.")
+                response_text = response_text.replace(self.prompt_instruction, ' ').replace('#', ' ').split('User Query')[0]
+                for phrase in self.text_to_replace:
+                    response_text = response_text.replace(phrase, ' ')
+
+                if self.verbose:
+                    print(response_data)
+                return response_text
+            except Exception as e:
+                print(f"Error in connecting to the HuggingFace API: {e}")
                 return None
             
 # Example usage with command-line argument for specifying the JSON file
@@ -251,12 +265,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Initialize your RAG instance 
-    rag = RAG()
+    #rag = RAG(verbose=True, pinecone_index_name='dukechatbot0413')
+    #rag.populate_pinecone('data/extracted_data_2024-04-01_07-59-36.json')
 
     # Load and process the specified JSON file for creating the vector db. 
     # Not necessary if already created
     
-    #rag.create_pinecone(args.json_file)
 
     # Query the pinecone vector storage
     phrase = 'who is telford?'

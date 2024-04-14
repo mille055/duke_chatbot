@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-
+use_gpt = False
 # Initialize RAG with environment variables or directly with your keys
-rag = RAG()
+rag = RAG(use_gpt=use_gpt)
 
 # Streamlit page configuration
 st.set_page_config(page_title="Duke AIPI Chatbot", layout="wide")
@@ -48,12 +48,15 @@ def run_UI():
         }
         .stChatInputContainer > div {
                 background-color: #E5E5E5;
-                border-color: #E5E5E5;
+                border-color: #012169;
                 padding: 10px;
                 border-radius: 15 px;
                 margin: 10px;
                 float: left;
                 clear: both;
+        }
+        .st-checkbox label span {
+            background-color: #012169;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -68,6 +71,13 @@ def run_UI():
     # Initialize or retrieve the conversation history from the session state
     if 'conversation_history' not in st.session_state:
         st.session_state.conversation_history = []
+
+    if 'use_gpt' not in st.session_state:
+        st.session_state.use_gpt = use_gpt
+    
+     # Add a checkbox widget for toggling GPT functionality
+    st.session_state.use_gpt = st.checkbox('Use GPT')
+    rag.use_gpt = st.session_state.use_gpt
 
 
     for message in st.session_state.conversation_history:
@@ -89,6 +99,8 @@ def run_UI():
         with st.chat_message("assistant", avatar=avatar_assistant):
             whole_prompt = 'Please answer the following query:' + prompt + 'and the following context may be helpful' + " ".join([message['content'] for message in st.session_state.conversation_history])
             #print(whole_prompt)
+            # select the model to be used
+            rag.use_gpt = st.session_state.use_gpt
             response_text, sources = rag.generate_response(prompt)
             # Append user query and response to conversation history
             #st.session_state.conversation_history.append({"role": "user", "content": prompt})
@@ -98,7 +110,23 @@ def run_UI():
             if sources:
                 st.markdown(f"<div style='text-align: right;'><a href='{sources[0]}' target='_blank'><button style='background-color: #3F7D7B; color: white; padding: 10px 24px; margin: 10px; border: none; border-radius: 12px; cursor: pointer;'>Learn More</button></a></div>", unsafe_allow_html=True)
 
-        #st.session_state.conversation_history.append({"role": "assistant", "content": response_text})
+            
 
+            # if st.button('Try another way'): # and not st.session_state.use_gpt:  # If using HuggingFace and want to offer GPT alternative
+            #     st.session_state.button_clicked = True
+            #     print('button pressed')
+            #     #st.session_state.use_gpt = True  # Switch to GPT for next response
+            #     print('changing to gpt')
+            #     rag.use_gpt = True
+            #     rag.verbose = True
+            #     print('sending prompt of ', prompt)
+            #     response_text, _ = rag.generate_response(prompt)
+            #     print('getting response of', response_text)
+                
+            #     st.session_state.conversation_history.append({"role": "assistant", "content": response_text, "avatar": avatar_assistant})
+            #     bot_message(response_text)
+                #st.session_state.use_gpt = False
+                #st.experimental_rerun()
+           
 if __name__ == "__main__":
     run_UI()
