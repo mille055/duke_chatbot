@@ -140,11 +140,6 @@ class RAG:
             input=[text]
             )
         embedding = response.data[0].embedding
-        #client.embeddings.create(input = [text], model=model).data[0].embedding
-        # if self.verbose:
-        #     print('type of embedding is ', type(embedding))
-        #     print(unique_id, embedding, source)
-        #self.index.upsert(id=unique_id, vectors=embedding, metadata={"source": source, "text": text})
         self.index.upsert(vectors=[{"id": unique_id, "values":embedding, "metadata":{"source": source, "text": text}}])
 
     def load_and_process_json(self, json_file):
