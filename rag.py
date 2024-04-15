@@ -304,10 +304,10 @@ class RAG:
                 return response_text
             except Exception as e:
                 print(f"Error in connecting to the HuggingFace API: {e}")
-                return "Error in connecting to the HuggingFace API. Please wait a few minutes or try using GPT (toggle above)"
+                return "Error in connecting to the HuggingFace API. Please wait a few minutes or try using GPT (toggle above). Additionally, you can click the 'View Source' button to view a relevant web page."
 
 
-    def get_similar_faq(self, query, index_name="faq-database", threshold=0.4):
+    def get_similar_faq(self, query, index_name="faq-database", threshold=0.6):
         '''
         Gets a QA pair from the FAQ database with the highest similarity score if above the threshold value.
         Inputs:
