@@ -101,7 +101,7 @@ def run_UI():
             user_message(prompt)
 
         with st.chat_message("assistant", avatar=avatar_assistant):
-            whole_prompt = 'Please answer the following query and generate a response. please do not include the text discuess... or the text outlines...:' + prompt + 'and the following context may be helpful' + " ".join([message['content'] for message in st.session_state.conversation_history])
+            whole_prompt = 'Please answer the following query and generate a response. please do not include phrases like the text discusses... or the text outlines...:' + prompt + 'and the following context may be helpful' + " ".join([message['content'] for message in st.session_state.conversation_history])
             #print(whole_prompt)
             # select the model to be used
             rag.use_gpt = st.session_state.use_gpt
@@ -114,23 +114,7 @@ def run_UI():
             if sources:
                 st.markdown(f"<div style='text-align: right;'><a href='{sources[0]}' target='_blank'><button style='background-color: #3F7D7B; color: white; padding: 10px 24px; margin: 10px; border: none; border-radius: 12px; cursor: pointer;'>View Source</button></a></div>", unsafe_allow_html=True)
 
-            #st.markdown(f"<div style='text-align: right;'><a href='https://github.com/mille055/duke_chatbot/tree/main/assets/AIPI-Incoming-Student-FAQ.docx' target='_blank'><button style='background-color: #3F7D7B; color: white; padding: 10px 24px; margin: 10px; border: none; border-radius: 12px; cursor: pointer;'>View FAQs</button></a></div>", unsafe_allow_html=True)
-
-            # if st.button('Try another way'): # and not st.session_state.use_gpt:  # If using HuggingFace and want to offer GPT alternative
-            #     st.session_state.button_clicked = True
-            #     print('button pressed')
-            #     #st.session_state.use_gpt = True  # Switch to GPT for next response
-            #     print('changing to gpt')
-            #     rag.use_gpt = True
-            #     rag.verbose = True
-            #     print('sending prompt of ', prompt)
-            #     response_text, _ = rag.generate_response(prompt)
-            #     print('getting response of', response_text)
-                
-            #     st.session_state.conversation_history.append({"role": "assistant", "content": response_text, "avatar": avatar_assistant})
-            #     bot_message(response_text)
-                #st.session_state.use_gpt = False
-                #st.experimental_rerun()
+          
            
 if __name__ == "__main__":
     run_UI()

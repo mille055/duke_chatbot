@@ -281,7 +281,7 @@ class RAG:
     
             except Exception as e:
                 print(f"Error in generating response: {e}")
-                return None
+                return "Error in generating response"
         
         else:
 
@@ -304,7 +304,7 @@ class RAG:
                 return response_text
             except Exception as e:
                 print(f"Error in connecting to the HuggingFace API: {e}")
-                return None
+                return "Error in connecting to the HuggingFace API. Please wait a few minutes or try using GPT (toggle above)"
 
 
     def get_similar_faq(self, query, index_name="faq-database", threshold=0.4):
