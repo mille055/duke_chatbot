@@ -16,7 +16,7 @@ import requests
 load_dotenv()
 
 class RAG:
-    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = None, llm_url = None, use_gpt = False, verbose=True):
+    def __init__(self, openai_embedding_model = 'text-embedding-3-small', openai_engine='gpt-3.5-turbo', top_k=3, search_threshold=0.8, max_token_length=512, chunk_size = 500, chunk_overlap = 25, pinecone_index_name = None, llm_url = None, use_gpt = False, verbose=False):
         #pinecone
         self.pinecone_api_key = os.getenv('PINECONE_API_KEY')     
         # index: can pass index or get environment variable; if none, use default
@@ -72,16 +72,19 @@ class RAG:
     
         # Initialize Pinecone client
         self.pc = Pinecone(api_key=self.pinecone_api_key)
+       
         if self.pinecone_index_name in self.pc.list_indexes().names():
+            #print(self.pinecone_index_name)
             self.index = self.pc.Index(self.pinecone_index_name)
         else:
             self.create_pinecone()
     
     # Create the Pinecone store
     def create_pinecone(self):
-        
+        if self.verbose:
+            print('creating pinecone index')
         if self.pinecone_index_name not in self.pc.list_indexes().names():
-            
+            print('of name ', self.pinecone_index_name)
             #self.index = self.pc.Index(self.pinecone_index_name)
             self.pc.create_index(
                 name=self.pinecone_index_name,
@@ -134,7 +137,6 @@ class RAG:
 
     def process_text(self, source, text, chunk_id):
         unique_id = hashlib.sha256(f"{source}_{chunk_id}".encode()).hexdigest()
-       #embedding = self.model.encode(text).tolist()
         response = self.openai_client.embeddings.create(
             model=self.openai_embedding_model,
             input=[text]
@@ -198,14 +200,7 @@ class RAG:
             return ("Sorry, I couldn't find a relevant response.", None)
 
     def integrate_llm(self, prompt):
-        # try:
-        #     input_ids = self.tokenizer.encode(prompt, return_tensors="pt")
-        #     response_ids = self.model.generate(input_ids, max_length=self.max_token_length)
-        #     response_text = self.tokenizer.decode(response_ids[0], skip_special_tokens=True)
-        #     return response_text
-        # except Exception as e:
-        #     print(f"Error in generating response: {e}")
-        #     return "An error occurred while generating a response."
+        
         if self.use_gpt:
             message=[{"role": "assistant", "content": "You are a trusted advisor helping to explain the text to prospective or current students who are seeking answers to questions"}, {"role": "user", "content": prompt}]
             if self.verbose:
@@ -220,9 +215,7 @@ class RAG:
                 )
                 # Extracting the content from the response
                 chat_message = response.choices[0].message.content
-                if self.verbose:
-                    print(chat_message)
-     
+                
                 return chat_message
     
             except Exception as e:
@@ -246,43 +239,59 @@ class RAG:
                 for phrase in self.text_to_replace:
                     response_text = response_text.replace(phrase, ' ')
 
-                if self.verbose:
-                    print(response_data)
+                
                 return response_text
             except Exception as e:
                 print(f"Error in connecting to the HuggingFace API: {e}")
                 return None
 
 
-    # def get_similar_faq(self, query, index_name="faq-database", threshold=0.4):
-    #     print('get similar faq running with text', query)
-    #     try:
-    #         # Initialize Pinecone client
-    #         faq_pc = Pinecone(self.pinecone_api_key)
-    #         print('set up pinecone client')
-    #         # Get the index
-    #         faq_index = faq_pc.Index(index_name)
-    #         print('the pinecone index is ', index_name)
+    def get_similar_faq(self, query, index_name="faq-database", threshold=0.4):
+        '''
+        Gets a QA pair from the FAQ database with the highest similarity score if above the threshold value.
+        Inputs:
+            query(str): the entered user question
+            index_name(str): the pinecone index
+            threshold(float): the threshold value above which is considered a match on the similarity search
+        Outputs:
+            matching_text(str): the answer for the matching query
+            matching_score(float): the similarity score for the matching item
+        '''
+        print('get similar faq running with text', query)
+        try:
+            # Initialize Pinecone client
+            faq_pc = Pinecone(self.pinecone_api_key)
+            if self.verbose:
+                print('setting up pinecone client')
+            # Get the index
+            faq_index = faq_pc.Index(index_name)
+            if self.verbose:
 
-    #         # Embed the query using OpenAI's embedding API
-    #         response = self.openai_client.embeddings.create(
-    #             model=self.openai_embedding_model,
-    #             input=[query]
-    #             )
-    #         query_embedding = response['data'][0]['embedding']
-    #         print('query_embedding finished.', query_embedding)
-    #         # Query the vector index
-    #         results = faq_index.query(vector=query_embedding, top_k=1, include_metadata=True)
-    #         matches = results["matches"]
-    #         print('matches:', matches)
-    #         if matches and matches[0]["score"] >= threshold:
-    #             return matches[0]["metadata"]["answer"]
-    #         else:
-    #             return None
+                print('Setting up pinecone client with index', index_name)
 
-    #     except Exception as e:
-    #         print(f"Error: {e}")
-    #         return None
+            #Embed the query using OpenAI's embedding API
+            response = self.openai_client.embeddings.create(
+                model=self.openai_embedding_model,
+                input=[query])
+            #print('response is', response)
+            query_embedding = response.data[0].embedding
+            #print('query_embedding finished.', query_embedding)
+            
+            # Query the vector index
+            results = faq_index.query(vector=query_embedding, top_k=1, include_metadata=True)
+            matches = results["matches"]
+            #print('matches:', matches)
+            if matches and matches[0]["score"] >= threshold:
+                # returns the text and the score
+                matching_text = matches[0]["metadata"]["answer"]
+                matching_score = matches[0]["score"]
+                return matching_text, matching_score
+            else:
+                return None, None
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return None, None
 
 # Example usage with command-line argument for specifying the JSON file
 if __name__ == "__main__":
@@ -291,7 +300,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Initialize your RAG instance 
-    rag = RAG(verbose=True, pinecone_index_name='dukechatbot0413')
+    rag = RAG()
     #rag.populate_pinecone('data/extracted_data_2024-04-01_07-59-36.json')
 
     # Load and process the specified JSON file for creating the vector db. 
@@ -299,12 +308,15 @@ if __name__ == "__main__":
     
 
     # Query the pinecone vector storage
-    phrase = 'who is telford?'
-    texts, sources = rag.semantic_search(phrase)
-    print(texts)
-    #similar_faq = rag.get_similar_faq(phrase)
+    phrase = 'How do I get a roommate?'
+    #print('phrase is', phrase)
+    #texts, sources = rag.semantic_search(phrase)
+    #print(texts)
+    similar_faq, similar_score = rag.get_similar_faq(phrase)
     #print(similar_faq)
+    print('Matching text: ', similar_faq, '\nScore: ', similar_score)
+    
 
-    llm_response, sources = rag.generate_response(phrase)
-    print(llm_response)
-    print('learn more by clicking', sources[0])
+#    llm_response, sources = rag.generate_response(phrase)
+#    print(llm_response)
+#    print('learn more by clicking', sources[0])
