@@ -100,9 +100,11 @@ class RAG:
         self.index = self.pc.Index(self.pinecone_index_name)
         #self.load_and_process_json(json_file)
 
+    # deletes a pinecone index
     def clear_pinecone(self, index_to_clear):
         self.pc.delete_index(index_to_clear)
 
+    # adds processed and embedded chunks from a json file to a pinecone index 
     def populate_pinecone(self, json_file):
         self.load_and_process_json(json_file)
 
@@ -112,12 +114,10 @@ class RAG:
         Splits text into chunks with a specified maximum length and overlap,
         trying to split at sentence endings when possible.
 
-        Args:
+        Imput:
             self
             text (str): The input text.
-        
-
-        Returns:
+        Output:
             chunks (list of str): Chunks of text.
         """
         chunks = []
@@ -136,6 +136,19 @@ class RAG:
         return chunks
 
     def process_text(self, source, text, chunk_id):
+        """
+        Processes a grouping of the source, text, and chunk_id by getting embeddings
+        and adding to the pinecone storage
+
+        Imput:
+            self
+            source (str): The url of the source of the chunk with the hightest relevance
+            text (str): The text of the chunk
+            chunk_id (str): The number corresopnding to the chunk
+        Output:
+            No output. Adjusts the pinecone vector storage
+        """
+        
         unique_id = hashlib.sha256(f"{source}_{chunk_id}".encode()).hexdigest()
         response = self.openai_client.embeddings.create(
             model=self.openai_embedding_model,
@@ -144,7 +157,18 @@ class RAG:
         embedding = response.data[0].embedding
         self.index.upsert(vectors=[{"id": unique_id, "values":embedding, "metadata":{"source": source, "text": text}}])
 
+
+
     def load_and_process_json(self, json_file):
+        """
+        Loads the json file and calls the text chunker
+
+        Imput:
+            self
+            json_file (str): The path/name of the json file to load and process
+        Output:
+            No output. Calls process text to add to the vector store
+        """
         with open(json_file, 'r', encoding='utf-8') as file:
             data = json.load(file)
         for source, text in data.items():
@@ -166,6 +190,17 @@ class RAG:
 
 
     def semantic_search(self, query):
+        """
+        Performs a semantic search on the pinecone vector database
+
+        Imput:
+            self
+            query (str): The text input that is to be matched in the vector database
+            
+        Output:
+            texts (list of str): the k highest matching chunks in a list
+            sources (list of str): the source URLs of the k highest matching chunks
+        """
         source_list = []
         texts = []
         try:
@@ -189,11 +224,20 @@ class RAG:
         
 
     def generate_response(self, query):
-        
+        """
+        Generates the response based on the provided query by calling the semantic search, 
+        summarizing the top k chunks, and calling the function that sends the summarized chunks to
+        either chatgpt or our fine-tuned model depending on self.use_gpt which can be toggled in the
+        app. 
+        Inputs:
+            self
+            query (str): The user input question as a string.
+        Outputs:
+            response, sources (str, str): The output string from the chosen model and associated source
+        """
         texts, sources = self.semantic_search(query)
         if texts:
             combined_chunks = " ".join(texts)
-            OpenAI_api_key = os.getenv('OPENAI_API_KEY')
             summarized_response = self.openai_client.chat.completions.create(
                     model=self.openai_engine,  
                     messages=[{"role": "system", "content": "You are a helpful assistant."},{"role": "user", "content":"Summarize the following text:\n" + combined_chunks + "Please provide a concise summary to prospective students who are seeking answers to questions, starting directly with the key points without introductory phrases like 'The text discusses', 'The text outlines', 'The text covers', 'The text provided' or 'The text introduces'. Please generate text in complete sentences. Please also do not over-summarized, student need useful information"}],
@@ -202,13 +246,22 @@ class RAG:
                 )
             summarized_chunks = summarized_response.choices[0].message.content
             prompt = self.prompt_instruction + "\n Context: " + summarized_chunks + "\nUser Query:\n\n {} ###\n\n".format(query)
-            #prompt = prompt[:1024]
-            return (self.integrate_llm(prompt), sources)
+            response = self.integrate_llm(prompt)
+            return response, sources
         else:
             return ("Sorry, I couldn't find a relevant response.", None)
 
     def integrate_llm(self, prompt):
-        
+        """
+        Handles getting the response from the chosen model and the interface with the model for the 
+        prompt provided by generate_response
+
+        Imput:
+            self
+            prompt (str): The text input that forms the prompt as constructed in generate_response         
+        Output:
+            chat_message (str): The output message from the model
+        """
         if self.use_gpt:
             message=[{"role": "assistant", "content": "You are a trusted advisor helping to explain the text to prospective or current students who are seeking answers to questions"}, {"role": "user", "content": prompt}]
             if self.verbose:
