@@ -37,7 +37,7 @@ class RAG:
         self.top_k = top_k
         self.search_threshold = search_threshold
         self.max_token_length = max_token_length
-        self.prompt_instruction = prompt_instruction = "Please summarize the text to prospective students who are seeking answers to questions. Please be informative and helpful, and summarize the context rather than repeating it word for word. Here is some context and the question: "
+        self.prompt_instruction = prompt_instruction = "Please provide a concise summary to prospective students who are seeking answers to questions. Please generate text in complete sentences. Here is some context and the question: "
         self.verbose = verbose
 
         # our model 
@@ -193,7 +193,15 @@ class RAG:
         texts, sources = self.semantic_search(query)
         if texts:
             combined_chunks = " ".join(texts)
-            prompt = self.prompt_instruction + "\n Context: " + combined_chunks + "\nUser Query:\n\n {} ###\n\n".format(query)
+            OpenAI_api_key = os.getenv('OPENAI_API_KEY')
+            summarized_response = self.openai_client.chat.completions.create(
+                    model=self.openai_engine,  
+                    messages=[{"role": "system", "content": "You are a helpful assistant."},{"role": "user", "content":"Summarize the following text:\n" + combined_chunks + "Please provide a concise summary to prospective students who are seeking answers to questions, starting directly with the key points without introductory phrases like 'The text discusses', 'The text outlines', 'The text covers', 'The text provided' or 'The text introduces'. Please generate text in complete sentences. Please also do not over-summarized, student need useful information"}],
+                    max_tokens=300,  
+                    temperature=0.1  
+                )
+            summarized_chunks = summarized_response.choices[0].message.content
+            prompt = self.prompt_instruction + "\n Context: " + summarized_chunks + "\nUser Query:\n\n {} ###\n\n".format(query)
             #prompt = prompt[:1024]
             return (self.integrate_llm(prompt), sources)
         else:
@@ -295,6 +303,7 @@ class RAG:
 
 # Example usage with command-line argument for specifying the JSON file
 if __name__ == "__main__":
+    rag = RAG()
     parser = argparse.ArgumentParser(description="Load text data from a JSON file and process with RAG.")
     parser.add_argument("--json_file", default="data/extracted_data_2024-04-01_07-59-36.json", help="Path to the JSON file containing text data.")
     args = parser.parse_args()

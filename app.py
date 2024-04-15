@@ -101,7 +101,7 @@ def run_UI():
             user_message(prompt)
 
         with st.chat_message("assistant", avatar=avatar_assistant):
-            whole_prompt = 'Please answer the following query:' + prompt + 'and the following context may be helpful' + " ".join([message['content'] for message in st.session_state.conversation_history])
+            whole_prompt = 'Please answer the following query and generate a response. please do not include the text discuess... or the text outlines...:' + prompt + 'and the following context may be helpful' + " ".join([message['content'] for message in st.session_state.conversation_history])
             #print(whole_prompt)
             # select the model to be used
             rag.use_gpt = st.session_state.use_gpt
