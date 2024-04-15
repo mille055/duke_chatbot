@@ -1,3 +1,6 @@
+### Extracts text from a list of websites as well as linked urls from those sites and loads into json object
+### Saves json object as a file 
+
 import logging
 import requests
 from bs4 import BeautifulSoup
@@ -121,21 +124,6 @@ def fetch_and_process_url(url):
     text = extract_text_from_html(html_content)
     return text
 
-# def process_urls_concurrently(urls, max_workers=5):
-#     """
-#     Uses threading to process multiple URLs concurrently.
-#     """
-#     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-#         future_to_url = {executor.submit(fetch_and_process_url, url): url for url in urls}
-#         for future in future_to_url:
-#             url = future_to_url[future]
-#             try:
-#                 data = future.result()
-#                 # Optional: Save or process the data here
-#             except Exception as exc:
-#                 logging.error(f'{url} generated an exception: {exc}')
-#             else:
-#                 logging.info(f'{url} page length: {len(data)}')
 
 
 def save_to_json(data, filename="extracted_data.json"):
