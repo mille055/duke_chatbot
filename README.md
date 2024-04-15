@@ -8,7 +8,7 @@ This project includes chat bot using a fine-tuned local LLM and a *Retrieval Aug
 
 ## Overview
 
-1. **Chat agent**: Users can chat with
+1. **Chat agent**: Users can ask any questions regarding the Duke AIPI program, including application process, course overview, faculty members and career resources.
 2. **Text Preparation**: 
 4. **Embedding and Indexing**:  
 5. **Streawmlit Interface**: 
