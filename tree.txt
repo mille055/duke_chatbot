@@ -1,0 +1,46 @@
+.
+├── README.md
+├── app.py
+├── assets
+│   ├── AIPI-Incoming-Student-FAQ.docx
+│   ├── Blue_question_mark_icon.png
+│   ├── duke_chapel_blue.png
+│   ├── duke_chapel_blue_with_text.png
+│   ├── duke_d.png
+│   ├── duke_d_2.png
+│   ├── duke_logo_pic.png
+│   ├── duke_picture1.jpg
+│   ├── duke_picture1.png
+│   ├── duke_picture2.png
+│   ├── duke_picture3.png
+│   ├── empty.txt
+│   └── mashup_duke_image_title.png
+├── data
+│   ├── AIPI-Incoming-Student-FAQ.docx
+│   ├── AIPI-Incoming-Student-FAQ.txt
+│   ├── archive
+│   │   ├── app_old.py
+│   │   └── extracted_data_2024-03-31_12-20-18.json
+│   ├── extracted_data_2024-04-01_07-59-36.json
+│   ├── extracted_data_from_faq.json
+│   ├── faqs.html
+│   ├── fine_tune_data.json
+│   ├── q_a_list.jsonl
+│   └── updated_qa_pairs.json
+├── example.env
+├── extract_text.py
+├── extract_text_from_faqdoc.py
+├── faq_to_html.py
+├── faq_to_pinecone.py
+├── notebooks
+│   ├── Copy_of_Create_ft_data.ipynb
+│   ├── Copy_of_chatbot_Finetune_notebook0412.ipynb
+│   ├── MergeModels.ipynb
+│   ├── Mistral_7B_finetune_0413.ipynb
+│   ├── chatbot_Finetune_notebook.ipynb
+│   └── chatbot_Finetune_notebook2.ipynb
+├── rag.py
+├── requirements.txt
+└── tree.txt
+
+5 directories, 39 files
