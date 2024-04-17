@@ -41,6 +41,7 @@ streamlit run app.py
 
 
 ## Directory Structure
+```
 .
 ├── README.md
 ├── app.py
@@ -87,3 +88,4 @@ streamlit run app.py
 └── tree.txt
 
 5 directories, 39 files
+```
