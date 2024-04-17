@@ -41,7 +41,7 @@ streamlit run app.py
 
 
 ## Directory Structure
-
+.
 ├── README.md
 ├── app.py
 ├── assets
