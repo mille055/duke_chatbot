@@ -32,7 +32,9 @@ pip install -r requirements.txt
 **4. Add OpenAI API Key and other keys**
 ```
 - Copy the `env.example` file and rename the copy to `.env`.
-- Open the `.env` file and replace `your_api_key_here` with your actual OpenAI API key. Add your own Pinecone and HuggingFace keys and tokens as well if you are using your resources.  
+- Open the `.env` file and replace `your_api_key_here` with your actual OpenAI API key 
+
+Add your own Pinecone and HuggingFace keys and tokens as well if you are using your resources.  
 ```
 **5. Run the application**
 ```
